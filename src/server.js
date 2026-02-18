@@ -23,7 +23,8 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'Hello world!' });
 });
 
-app.use(authRoutes);
+// app.use(authRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use(notFoundHandler);
 
