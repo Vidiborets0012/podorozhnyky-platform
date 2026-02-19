@@ -9,6 +9,12 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    savedStories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Story',
+      },
+    ],
   },
   {
     timestamps: true,
