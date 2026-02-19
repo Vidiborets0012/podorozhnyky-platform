@@ -10,6 +10,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { connectMongoDB } from './db/connectMongoDB.js';
 import authRoutes from './routes/authRoutes.js';
 import usersRoutes from './routes/usersRoutes.js';
+import categoriesRoutes from './routes/categoriesRoutes.js';
 import { API_PREFIX } from './constants/api.js';
 
 const app = express();
@@ -30,6 +31,7 @@ app.get('/', (req, res) => {
 
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/users`, usersRoutes);
+app.use(`${API_PREFIX}/categories`, categoriesRoutes);
 
 app.use(notFoundHandler);
 
