@@ -1,10 +1,9 @@
 import { Story } from '../models/story.js';
 
 export const getStoriesController = async (req, res) => {
-  const { page = 1, perPage = 10, category } = req.query;
+  const { page = 1, limit = 10, category } = req.query;
 
-  const limit = Number(perPage);
-  const skip = (Number(page) - 1) * limit;
+  const skip = (Number(page) - 1) * Number(limit);
 
   const filter = {};
 
@@ -15,9 +14,10 @@ export const getStoriesController = async (req, res) => {
   const [stories, total] = await Promise.all([
     Story.find(filter)
       .populate('category', 'name')
+      .populate('ownerId', 'name avatarUrl')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit),
+      .limit(Number(limit)),
     Story.countDocuments(filter),
   ]);
 
@@ -25,7 +25,7 @@ export const getStoriesController = async (req, res) => {
     data: stories,
     pagination: {
       page: Number(page),
-      perPage: limit,
+      limit: Number(limit),
       total,
       totalPages: Math.ceil(total / limit),
     },

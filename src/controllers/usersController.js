@@ -18,7 +18,9 @@ export const addSavedStoryController = async (req, res) => {
     userId,
     { $addToSet: { savedStories: storyId } },
     { new: true },
-  ).populate('savedStories');
+  )
+    .populate('savedStories')
+    .populate('ownerId', 'name avatarUrl');
 
   res.status(200).json({ data: user });
 };

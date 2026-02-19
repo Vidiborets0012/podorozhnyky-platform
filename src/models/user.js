@@ -15,6 +15,8 @@ const userSchema = new Schema(
         ref: 'Story',
       },
     ],
+    articlesAmount: { type: Number, default: 0 },
+    description: { type: String, default: '' },
   },
   {
     timestamps: true,
