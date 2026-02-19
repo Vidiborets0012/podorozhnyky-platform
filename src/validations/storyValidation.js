@@ -1,5 +1,5 @@
 import { Joi, Segments } from 'celebrate';
-import { objectIdValidator } from '../utils/objectIdValidator';
+import { objectIdValidator } from '../utils/objectIdValidator.js';
 
 export const getStoriesQuerySchema = {
   [Segments.QUERY]: Joi.object({
