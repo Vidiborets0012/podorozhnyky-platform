@@ -9,6 +9,7 @@ import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { connectMongoDB } from './db/connectMongoDB.js';
 import authRoutes from './routes/authRoutes.js';
+import { API_PREFIX } from './constants/api.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -24,7 +25,9 @@ app.get('/', (req, res) => {
 });
 
 // app.use(authRoutes);
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
+
+app.use(`${API_PREFIX}/auth`, authRoutes);
 
 app.use(notFoundHandler);
 
