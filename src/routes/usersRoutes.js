@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate.js';
 import { celebrate } from 'celebrate';
-import { addSavedStoryController } from '../controllers/usersController.js';
+import {
+  addSavedStoryController,
+  removeSavedStoryController,
+} from '../controllers/usersController.js';
 import { storyIdParamSchema } from '../validations/storyValidation.js';
 
 const router = Router();
@@ -16,6 +19,14 @@ router.post(
   authenticate,
   celebrate(storyIdParamSchema),
   addSavedStoryController,
+);
+
+//DELETE /api/users/me/saved-stories/:storyId
+router.delete(
+  '/me/saved-stories/:storyId',
+  authenticate,
+  celebrate(storyIdParamSchema),
+  removeSavedStoryController,
 );
 
 export default router;

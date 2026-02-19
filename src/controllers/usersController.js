@@ -31,3 +31,30 @@ export const addSavedStoryController = async (req, res) => {
     data: user.savedStories,
   });
 };
+
+export const removeSavedStoryController = async (req, res) => {
+  const { storyId } = req.params;
+  const userId = req.user._id;
+
+  const story = await Story.findById(storyId);
+
+  if (!story) {
+    throw createHttpError(404, 'Story not found');
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $pull: { savedStories: storyId } },
+    { new: true },
+  ).populate({
+    path: 'savedStories',
+    populate: [
+      { path: 'ownerId', select: 'name avatarUrl' },
+      { path: 'category', select: 'name' },
+    ],
+  });
+
+  res.status(200).json({
+    data: user.savedStories,
+  });
+};
