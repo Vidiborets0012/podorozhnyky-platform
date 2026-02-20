@@ -3,9 +3,13 @@ import { authenticate } from '../middleware/authenticate.js';
 import { celebrate } from 'celebrate';
 import {
   addSavedStoryController,
+  getSavedStoriesController,
   removeSavedStoryController,
 } from '../controllers/usersController.js';
-import { storyIdParamSchema } from '../validations/storyValidation.js';
+import {
+  paginationQuerySchema,
+  storyIdParamSchema,
+} from '../validations/storyValidation.js';
 
 const router = Router();
 
@@ -27,6 +31,14 @@ router.delete(
   authenticate,
   celebrate(storyIdParamSchema),
   removeSavedStoryController,
+);
+
+//GET /api/users/me/saved-stories + пагінація
+router.get(
+  '/me/saved-stories',
+  authenticate,
+  celebrate(paginationQuerySchema),
+  getSavedStoriesController,
 );
 
 export default router;
