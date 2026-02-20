@@ -66,3 +66,38 @@ export const createStoryController = async (req, res) => {
     data: populatedStory,
   });
 };
+
+export const updateStoryController = async (req, res) => {
+  const { storyId } = req.params;
+  const userId = req.user._id;
+  const updateData = req.body;
+
+  const story = await Story.findById(storyId);
+
+  if (!story) {
+    throw createHttpError(404, 'Story not found');
+  }
+
+  // Перевірка власника
+  if (story.ownerId.toString() !== userId.toString()) {
+    throw createHttpError(403, 'You are not allowed to edit this story');
+  }
+
+  // Якщо оновлюється категорія — перевірити її
+  if (updateData.category) {
+    const categoryExists = await Category.findById(updateData.category);
+    if (!categoryExists) {
+      throw createHttpError(404, 'Category not found');
+    }
+  }
+
+  const updatedStory = await Story.findByIdAndUpdate(storyId, updateData, {
+    new: true,
+  })
+    .populate('category', 'name')
+    .populate('ownerId', 'name avatarUrl');
+
+  res.status(200).json({
+    data: updatedStory,
+  });
+};

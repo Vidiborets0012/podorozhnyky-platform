@@ -4,10 +4,13 @@ import { celebrate } from 'celebrate';
 import {
   createStoryController,
   getStoriesController,
+  updateStoryController,
 } from '../controllers/storiesController.js';
 import {
   createStorySchema,
   getStoriesQuerySchema,
+  storyIdParamSchema,
+  updateStorySchema,
 } from '../validations/storyValidation.js';
 import { authenticate } from '../middleware/authenticate.js';
 
@@ -20,6 +23,14 @@ router.post(
   authenticate,
   celebrate(createStorySchema),
   createStoryController,
+);
+
+router.patch(
+  '/:storyId',
+  authenticate,
+  celebrate(storyIdParamSchema),
+  celebrate(updateStorySchema),
+  updateStoryController,
 );
 
 export default router;

@@ -31,3 +31,13 @@ export const createStorySchema = {
     date: Joi.string().required(),
   }),
 };
+
+export const updateStorySchema = {
+  [Segments.BODY]: Joi.object({
+    img: Joi.string().uri().optional(),
+    title: Joi.string().max(150).optional(),
+    article: Joi.string().max(10000).optional(),
+    category: Joi.string().custom(objectIdValidator).optional(),
+    date: Joi.string().optional(),
+  }).min(1),
+};
