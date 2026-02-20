@@ -3,6 +3,7 @@ import { authenticate } from '../middleware/authenticate.js';
 import { celebrate } from 'celebrate';
 import {
   addSavedStoryController,
+  getMyStoriesController,
   getSavedStoriesController,
   removeSavedStoryController,
 } from '../controllers/usersController.js';
@@ -39,6 +40,15 @@ router.get(
   authenticate,
   celebrate(paginationQuerySchema),
   getSavedStoriesController,
+);
+
+// Приватний ендпоінт для отримання власних історій автора + пагінація
+// GET /api/users/me/stories;
+router.get(
+  '/me/stories',
+  authenticate,
+  celebrate(paginationQuerySchema),
+  getMyStoriesController,
 );
 
 export default router;
