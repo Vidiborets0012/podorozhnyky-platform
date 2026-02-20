@@ -3,6 +3,7 @@ import { celebrate } from 'celebrate';
 
 import {
   createStoryController,
+  deleteStoryController,
   getStoriesController,
   updateStoryController,
 } from '../controllers/storiesController.js';
@@ -31,6 +32,13 @@ router.patch(
   celebrate(storyIdParamSchema),
   celebrate(updateStorySchema),
   updateStoryController,
+);
+
+router.delete(
+  '/:storyId',
+  authenticate,
+  celebrate(storyIdParamSchema),
+  deleteStoryController,
 );
 
 export default router;

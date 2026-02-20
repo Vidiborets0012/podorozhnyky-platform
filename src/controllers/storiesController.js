@@ -101,3 +101,35 @@ export const updateStoryController = async (req, res) => {
     data: updatedStory,
   });
 };
+
+export const deleteStoryController = async (req, res) => {
+  const { storyId } = req.params;
+  const userId = req.user._id;
+
+  const story = await Story.findById(storyId);
+
+  if (!story) {
+    throw createHttpError(404, 'Story not found');
+  }
+
+  // Перевірка власника
+  if (story.ownerId.toString() !== userId.toString()) {
+    throw createHttpError(403, 'You are not allowed to delete this story');
+  }
+
+  // Видаляємо історію
+  await Story.findByIdAndDelete(storyId);
+
+  // Декремент кількості статей автора
+  await User.findByIdAndUpdate(userId, {
+    $inc: { articlesAmount: -1 },
+  });
+
+  // Видаляємо storyId зі savedStories всіх користувачів
+  await User.updateMany(
+    { savedStories: storyId },
+    { $pull: { savedStories: storyId } },
+  );
+
+  res.status(204).send();
+};
