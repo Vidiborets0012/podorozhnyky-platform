@@ -3,6 +3,10 @@ import { Story } from '../models/story.js';
 import { Category } from '../models/category.js';
 import { User } from '../models/user.js';
 
+/**
+ *  ПУБЛІЧНИЙ ендпоінт для
+ * ОТРИМАННЯ історій + пагінація + фільтрація за категорією
+ */
 export const getStoriesController = async (req, res) => {
   const { page = 1, limit = 10, category } = req.query;
 
@@ -37,7 +41,10 @@ export const getStoriesController = async (req, res) => {
 
 //PRIVATE
 
-// мої історії
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * ОТРИМАННЯ власних історій користувача (автора) + пагінація
+ */
 export const getMyStoriesController = async (req, res) => {
   const { page = 1, limit = 9 } = req.query;
   const userId = req.user._id;
@@ -67,7 +74,10 @@ export const getMyStoriesController = async (req, res) => {
   });
 };
 
-// збережені історії
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * ОТРИМАННЯ збережених історій + пагінація
+ */
 export const getSavedStoriesController = async (req, res) => {
   const { page = 1, limit = 9 } = req.query;
   const userId = req.user._id;
@@ -98,7 +108,10 @@ export const getSavedStoriesController = async (req, res) => {
   });
 };
 
-// зберегти історію
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * ДОДАВАННЯ статті до збережених статей користувача
+ */
 export const addSavedStoryController = async (req, res) => {
   const { storyId } = req.params;
   const userId = req.user._id;
@@ -112,10 +125,22 @@ export const addSavedStoryController = async (req, res) => {
 
   // Додаємо до savedStories без дублікатів
   const user = await User.findByIdAndUpdate(
-    userId,
+    {
+      _id: userId,
+      savedStories: { $ne: storyId }, // перевірка що ще не збережено
+    },
     { $addToSet: { savedStories: storyId } },
     { new: true },
-  ).populate({
+  );
+
+  // якщо user !== null → реально додали
+  if (user) {
+    await Story.findByIdAndUpdate(storyId, {
+      $inc: { favoriteCount: 1 },
+    });
+  }
+
+  const updatedUser = await User.findById(userId).populate({
     path: 'savedStories',
     populate: [
       { path: 'ownerId', select: 'name avatarUrl' },
@@ -124,12 +149,18 @@ export const addSavedStoryController = async (req, res) => {
   });
 
   // res.status(200).json({ data: user });
+  // res.status(200).json({
+  //   data: user.savedStories,
+  // });
   res.status(200).json({
-    data: user.savedStories,
+    data: updatedUser.savedStories,
   });
 };
 
-// видалити із збережених
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * ВИДАЛЕННЯ статті зі збережених статей користувача
+ */
 export const removeSavedStoryController = async (req, res) => {
   const { storyId } = req.params;
   const userId = req.user._id;
@@ -141,10 +172,21 @@ export const removeSavedStoryController = async (req, res) => {
   }
 
   const user = await User.findByIdAndUpdate(
-    userId,
+    {
+      _id: userId,
+      savedStories: storyId, // тільки якщо існує
+    },
     { $pull: { savedStories: storyId } },
     { new: true },
-  ).populate({
+  );
+
+  if (user) {
+    await Story.findByIdAndUpdate(storyId, {
+      $inc: { favoriteCount: -1 },
+    });
+  }
+
+  const updatedUser = await User.findById(userId).populate({
     path: 'savedStories',
     populate: [
       { path: 'ownerId', select: 'name avatarUrl' },
@@ -152,12 +194,18 @@ export const removeSavedStoryController = async (req, res) => {
     ],
   });
 
+  // res.status(200).json({
+  //   data: user.savedStories,
+  // });
   res.status(200).json({
-    data: user.savedStories,
+    data: updatedUser.savedStories,
   });
 };
 
-// створити історію
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * СТВОРЕННЯ історії
+ */
 export const createStoryController = async (req, res) => {
   const { img, title, article, category, date } = req.body;
   const ownerId = req.user._id;
@@ -190,7 +238,10 @@ export const createStoryController = async (req, res) => {
   });
 };
 
-// редагувати
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * РЕДАГУВАННЯ історії
+ */
 export const updateStoryController = async (req, res) => {
   const { storyId } = req.params;
   const userId = req.user._id;
@@ -226,7 +277,10 @@ export const updateStoryController = async (req, res) => {
   });
 };
 
-// видалити
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * ВИДАЛЕННЯ історії
+ */
 export const deleteStoryController = async (req, res) => {
   const { storyId } = req.params;
   const userId = req.user._id;

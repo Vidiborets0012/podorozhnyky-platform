@@ -24,11 +24,18 @@ const router = Router();
 
 // PUBLIC
 
+/**
+ * СТВОРИТИ ПУБЛІЧНИЙ ендпоінт для
+ * ОТРИМАННЯ історій + пагінація + фільтрація за категорією
+ */
 router.get('/', celebrate(getStoriesQuerySchema), getStoriesController);
 
 //PRIVATE
 
-// мої історії
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * ОТРИМАННЯ власних історій користувача (автора) + пагінація
+ */
 router.get(
   '/my',
   authenticate,
@@ -36,7 +43,10 @@ router.get(
   getMyStoriesController,
 );
 
-// збережені історії
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * ОТРИМАННЯ збережених історій + пагінація
+ */
 router.get(
   '/saved',
   authenticate,
@@ -44,7 +54,10 @@ router.get(
   getSavedStoriesController,
 );
 
-// зберегти історію
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * ДОДАВАННЯ статті до збережених статей користувача
+ */
 router.post(
   '/:storyId/save',
   authenticate,
@@ -52,7 +65,10 @@ router.post(
   addSavedStoryController,
 );
 
-// видалити із збережених
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * ВИДАЛЕННЯ статті зі збережених статей користувача
+ */
 router.delete(
   '/:storyId/save',
   authenticate,
@@ -60,7 +76,10 @@ router.delete(
   removeSavedStoryController,
 );
 
-// створити історію
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * СТВОРЕННЯ історії
+ */
 router.post(
   '/',
   authenticate,
@@ -68,7 +87,10 @@ router.post(
   createStoryController,
 );
 
-// редагувати
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * РЕДАГУВАННЯ історії
+ */
 router.patch(
   '/:storyId',
   authenticate,
@@ -77,7 +99,10 @@ router.patch(
   updateStoryController,
 );
 
-// видалити
+/**
+ * СТВОРИТИ ПРИВАТНИЙ ендпоінт для
+ * ВИДАЛЕННЯ історії
+ */
 router.delete(
   '/:storyId',
   authenticate,
