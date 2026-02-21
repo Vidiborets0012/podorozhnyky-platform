@@ -1,6 +1,6 @@
 import { User } from '../models/user.js';
-// import { Story } from '../models/story.js';
-// import createHttpError from 'http-errors';
+import { Story } from '../models/story.js';
+import createHttpError from 'http-errors';
 
 /**
 
@@ -29,6 +29,32 @@ export const getUsersController = async (req, res) => {
       limit: Number(limit),
       total,
       totalPages: Math.ceil(total / limit),
+    },
+  });
+};
+
+/**
+ * ОТРИМАННЯ даних про користувача за ID + дані користувача + список статей
+ */
+export const getUserByIdController = async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId).select(
+    'name avatarUrl articlesAmount',
+  );
+
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const stories = await Story.find({ ownerId: userId })
+    .populate('category', 'name')
+    .sort({ createdAt: -1 });
+
+  res.json({
+    data: {
+      user,
+      stories,
     },
   });
 };
