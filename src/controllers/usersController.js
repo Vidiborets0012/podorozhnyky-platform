@@ -77,3 +77,19 @@ export const updateAvatarController = async (req, res) => {
     data: user,
   });
 };
+
+/**
+
+ * ОНОВЛЕННЯ даних користувача
+ */
+export const updateUserController = async (req, res) => {
+  const userId = req.user._id;
+
+  const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+    new: true,
+  }).select('-password');
+
+  res.json({
+    data: updatedUser,
+  });
+};

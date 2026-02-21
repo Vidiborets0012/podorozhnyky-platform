@@ -4,11 +4,13 @@ import {
   getUserByIdController,
   getUsersController,
   updateAvatarController,
+  updateUserController,
 } from '../controllers/usersController.js';
 import { celebrate } from 'celebrate';
 import {
   paginationQuerySchema,
   updateAvatarSchema,
+  updateUserSchema,
   userIdParamSchema,
 } from '../validations/userValidation.js';
 
@@ -46,6 +48,19 @@ router.patch(
   authenticate,
   celebrate(updateAvatarSchema),
   updateAvatarController,
+);
+
+/**
+ * ПРИВАТНИЙ ендпоінт для
+ * ОНОВЛЕННЯ даних користувача
+ * PATCH /api/users/me
+ */
+
+router.patch(
+  '/me',
+  authenticate,
+  celebrate(updateUserSchema),
+  updateUserController,
 );
 
 export default router;

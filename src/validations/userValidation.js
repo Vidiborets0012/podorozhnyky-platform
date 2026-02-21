@@ -1,5 +1,4 @@
 import { Joi, Segments } from 'celebrate';
-
 import { objectIdValidator } from '../utils/objectIdValidator.js';
 
 /**
@@ -28,4 +27,15 @@ export const updateAvatarSchema = {
   [Segments.BODY]: Joi.object({
     avatarUrl: Joi.string().uri().required(),
   }),
+};
+
+/**
+ * Оновлення даних користувача
+ */
+export const updateUserSchema = {
+  [Segments.BODY]: Joi.object({
+    name: Joi.string().min(2).max(32).optional(),
+
+    description: Joi.string().max(500).optional(),
+  }).min(1),
 };
