@@ -20,3 +20,12 @@ export const userIdParamSchema = {
     userId: Joi.string().custom(objectIdValidator).required(),
   }),
 };
+
+/**
+ * Оновлення аватару
+ */
+export const updateAvatarSchema = {
+  [Segments.BODY]: Joi.object({
+    avatarUrl: Joi.string().uri().required(),
+  }),
+};

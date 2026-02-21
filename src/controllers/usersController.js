@@ -58,3 +58,22 @@ export const getUserByIdController = async (req, res) => {
     },
   });
 };
+
+/**
+
+ * ОНОВЛЕННЯ аватару користувача
+ */
+export const updateAvatarController = async (req, res) => {
+  const userId = req.user._id;
+  const { avatarUrl } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { avatarUrl },
+    { new: true },
+  ).select('name avatarUrl articlesAmount');
+
+  res.json({
+    data: user,
+  });
+};
