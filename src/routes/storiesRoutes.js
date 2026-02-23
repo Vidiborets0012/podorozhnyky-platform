@@ -30,7 +30,12 @@ const router = Router();
  * СТВОРИТИ ПУБЛІЧНИЙ ендпоінт для
  * ОТРИМАННЯ історій + пагінація + фільтрація за категорією
  */
-router.get('/', celebrate(getStoriesQuerySchema), getStoriesController);
+router.get(
+  '/',
+  celebrate(getStoriesQuerySchema),
+  optionalAuthenticate,
+  getStoriesController,
+);
 
 //PRIVATE
 

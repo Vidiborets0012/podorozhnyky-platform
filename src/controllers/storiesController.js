@@ -2,6 +2,7 @@ import createHttpError from 'http-errors';
 import { Story } from '../models/story.js';
 import { Category } from '../models/category.js';
 import { User } from '../models/user.js';
+import { isValidObjectId } from 'mongoose';
 
 /**
  *  ПУБЛІЧНИЙ ендпоінт для
@@ -28,8 +29,19 @@ export const getStoriesController = async (req, res) => {
     Story.countDocuments(filter),
   ]);
 
+  let savedIds = [];
+
+  if (req.user?.savedStories) {
+    savedIds = req.user.savedStories.map((id) => id.toString());
+  }
+
+  const storiesWithFlag = stories.map((story) => ({
+    ...story.toObject(),
+    isSaved: savedIds.includes(story._id.toString()),
+  }));
+
   res.json({
-    data: stories,
+    data: storiesWithFlag,
     pagination: {
       page: Number(page),
       limit: Number(limit),
@@ -317,6 +329,9 @@ export const deleteStoryController = async (req, res) => {
 export const getStoryByIdController = async (req, res) => {
   const { storyId } = req.params;
 
+  if (!isValidObjectId(storyId)) {
+    throw createHttpError(400, 'Invalid story id');
+  }
   const story = await Story.findById(storyId)
     .populate('category', 'name')
     .populate('ownerId', 'name avatarUrl');
@@ -327,9 +342,14 @@ export const getStoryByIdController = async (req, res) => {
 
   let isSaved = false;
 
-  if (req.user) {
-    const user = await User.findById(req.user._id).select('savedStories');
-    isSaved = user.savedStories.some((id) => id.toString() === storyId);
+  // if (req.user) {
+  //   const user = await User.findById(req.user._id).select('savedStories');
+  //   isSaved = user.savedStories.some((id) => id.toString() === storyId);
+  // }
+  if (req.user?.savedStories) {
+    isSaved = req.user.savedStories
+      .map((id) => id.toString())
+      .includes(storyId);
   }
 
   const popularStories = await Story.find({
