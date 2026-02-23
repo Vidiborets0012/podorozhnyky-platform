@@ -8,6 +8,7 @@ import {
   getMyStoriesController,
   getSavedStoriesController,
   getStoriesController,
+  getStoryByIdController,
   removeSavedStoryController,
   updateStoryController,
 } from '../controllers/storiesController.js';
@@ -19,6 +20,7 @@ import {
   updateStorySchema,
 } from '../validations/storyValidation.js';
 import { authenticate } from '../middleware/authenticate.js';
+import { optionalAuthenticate } from '../middleware/optionalAuthenticate.js';
 
 const router = Router();
 
@@ -110,6 +112,6 @@ router.delete(
   deleteStoryController,
 );
 
-// router.get('/:storyId', optionalAuthenticate, getStoryByIdController);
+router.get('/:storyId', optionalAuthenticate, getStoryByIdController);
 
 export default router;
