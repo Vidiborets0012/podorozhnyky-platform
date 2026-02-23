@@ -312,3 +312,37 @@ export const deleteStoryController = async (req, res) => {
 
   res.status(204).send();
 };
+
+//GET /api/stories/:storyId
+export const getStoryByIdController = async (req, res) => {
+  const { storyId } = req.params;
+
+  const story = await Story.findById(storyId)
+    .populate('category', 'name')
+    .populate('ownerId', 'name avatarUrl');
+
+  if (!story) {
+    throw createHttpError(404, 'Story not found');
+  }
+
+  let isSaved = false;
+
+  if (req.user) {
+    const user = await User.findById(req.user._id).select('savedStories');
+    isSaved = user.savedStories.some((id) => id.toString() === storyId);
+  }
+
+  const popularStories = await Story.find({
+    _id: { $ne: storyId },
+  })
+    .populate('category', 'name')
+    .populate('ownerId', 'name avatarUrl')
+    .sort({ favoriteCount: -1 })
+    .limit(3);
+
+  res.status(200).json({
+    data: story,
+    isSaved,
+    popularStories,
+  });
+};
