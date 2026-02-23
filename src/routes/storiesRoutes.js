@@ -110,4 +110,6 @@ router.delete(
   deleteStoryController,
 );
 
+// router.get('/:storyId', optionalAuthenticate, getStoryByIdController);
+
 export default router;
