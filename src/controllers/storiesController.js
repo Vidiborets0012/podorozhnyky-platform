@@ -18,15 +18,16 @@ export const getStoriesController = async (req, res) => {
   if (category) {
     filter.category = category;
   }
+  //Тут ми створюємо динамічний об'єкт пошуку. Якщо категорія вказана в URL, ми додаємо її в умови пошуку для бази даних. Якщо ні — filter залишиться порожнім {} і база поверне всі історії.
 
   const [stories, total] = await Promise.all([
     Story.find(filter)
       .populate('category', 'name')
       .populate('ownerId', 'name avatarUrl')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }) //// Нові зверху
       .skip(skip)
       .limit(Number(limit)),
-    Story.countDocuments(filter),
+    Story.countDocuments(filter), //// Рахуємо скільки всього таких записів у БД
   ]);
 
   let savedIds = [];
@@ -333,32 +334,34 @@ export const getStoryByIdController = async (req, res) => {
     throw createHttpError(400, 'Invalid story id');
   }
   const story = await Story.findById(storyId)
-    .populate('category', 'name')
-    .populate('ownerId', 'name avatarUrl');
+    .populate('category', 'name') //Замість просто ID категорії підставляємо об'єкт з її назвою
+    .populate('ownerId', 'name avatarUrl'); //"Оживляємо" автора — отримуємо його ім'я та фото
 
   if (!story) {
     throw createHttpError(404, 'Story not found');
   }
 
-  let isSaved = false;
+  let isSaved = false; //за замовчуванням вважаємо, що не збережена
 
   // if (req.user) {
   //   const user = await User.findById(req.user._id).select('savedStories');
   //   isSaved = user.savedStories.some((id) => id.toString() === storyId);
   // }
+
+  //Якщо користувач авторизований і у нього є масив збережених історій
   if (req.user?.savedStories) {
     isSaved = req.user.savedStories
       .map((id) => id.toString())
-      .includes(storyId);
+      .includes(storyId); //Перетворюємо всі ID з масиву (які в Mongo є об'єктами) у рядки та перевіряємо, чи є серед них ID поточної історії
   }
 
   const popularStories = await Story.find({
-    _id: { $ne: storyId },
+    _id: { $ne: storyId }, //Оператор "Not Equal". Шукаємо інші історії, крім тієї, яку ми зараз відкрили
   })
     .populate('category', 'name')
     .populate('ownerId', 'name avatarUrl')
-    .sort({ favoriteCount: -1 })
-    .limit(3);
+    .sort({ favoriteCount: -1 }) //Сортуємо за популярністю (від найбільшої кількості лайків до найменшої)
+    .limit(3); // База бере перші 3 документи з цієї черги, а решту (навіть якщо їх там ще 1000) просто ігнорує.
 
   res.status(200).json({
     data: story,
