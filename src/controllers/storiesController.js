@@ -9,7 +9,8 @@ import { isValidObjectId } from 'mongoose';
  * ОТРИМАННЯ історій + пагінація + фільтрація за категорією
  */
 export const getStoriesController = async (req, res) => {
-  const { page = 1, limit = 10, category } = req.query;
+  // Додаємо sortBy до деструктуризації query
+  const { page = 1, limit = 10, category, sortBy } = req.query;
 
   const skip = (Number(page) - 1) * Number(limit);
 
@@ -18,13 +19,20 @@ export const getStoriesController = async (req, res) => {
   if (category) {
     filter.category = category;
   }
+
+  // Визначаємо логіку сортування
+  let sortOrder = { createdAt: -1 }; // За замовчуванням: нові зверху
+  if (sortBy === 'popular') {
+    sortOrder = { favoriteCount: -1 }; // Популярні зверху
+  }
+
   //Тут ми створюємо динамічний об'єкт пошуку. Якщо категорія вказана в URL, ми додаємо її в умови пошуку для бази даних. Якщо ні — filter залишиться порожнім {} і база поверне всі історії.
 
   const [stories, total] = await Promise.all([
     Story.find(filter)
       .populate('category', 'name')
       .populate('ownerId', 'name avatarUrl')
-      .sort({ createdAt: -1 }) //// Нові зверху
+      .sort(sortOrder) //// Динамічне сортування (дата або популярність)
       .skip(skip)
       .limit(Number(limit)),
     Story.countDocuments(filter), //// Рахуємо скільки всього таких записів у БД
