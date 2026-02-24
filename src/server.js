@@ -17,18 +17,21 @@ import { API_PREFIX } from './constants/api.js';
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.FRONTEND_URL, // Ми додамо це в панелі Render
+].filter(Boolean); // Видаляє порожні значення, якщо FRONTEND_URL ще не задано
+
 app.use(logger);
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true, // дозволяє передавати куки та заголовки авторизації
+  }),
+);
 app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Hello world!' });
-});
-
-// app.use(authRoutes);
-// app.use('/api/auth', authRoutes);
 
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/users`, usersRoutes);
