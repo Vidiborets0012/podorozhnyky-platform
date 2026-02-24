@@ -12,7 +12,9 @@ export const getStoriesController = async (req, res) => {
   // Додаємо sortBy до деструктуризації query
   const { page = 1, limit = 10, category, sortBy } = req.query;
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const pageNum = Math.max(1, Number(page));
+  const limitNum = Math.max(1, Number(limit));
+  const skip = (pageNum - 1) * limitNum;
 
   const filter = {};
 
@@ -52,10 +54,10 @@ export const getStoriesController = async (req, res) => {
   res.json({
     data: storiesWithFlag,
     pagination: {
-      page: Number(page),
-      limit: Number(limit),
+      page: pageNum,
+      limit: limitNum,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / limitNum),
     },
   });
 };
