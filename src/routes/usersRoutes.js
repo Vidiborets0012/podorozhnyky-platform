@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate.js';
 import {
+  getCurrentUser,
   getUserByIdController,
   getUsersController,
   updateAvatarController,
@@ -23,20 +24,18 @@ const router = Router();
 router.get('/', celebrate(paginationQuerySchema), getUsersController);
 
 /**
+ * ПРИВАТНИЙ ендпоінт для
+ * ОТРИМАННЯ інформації про поточного користувача
+ * GET /api/users/me
+ */
+router.get('/me', authenticate, getCurrentUser);
+
+/**
  * ПУБЛІЧНИЙ ендпоінт для
  * ОТРИМАННЯ даних про користувача за ID + дані користувача + список статей
  * GET /api/users/:userId
  */
 router.get('/:userId', celebrate(userIdParamSchema), getUserByIdController);
-
-/**
- * ПРИВАТНИЙ ендпоінт для
- * ОТРИМАННЯ інформації про поточного користувача
- * GET /api/users/me
- */
-router.get('/me', authenticate, (req, res) => {
-  res.json(req.user);
-});
 
 /**
  * ПРИВАТНИЙ ендпоінт для

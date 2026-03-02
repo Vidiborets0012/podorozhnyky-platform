@@ -14,9 +14,21 @@ export const paginationQuerySchema = {
 /**
  * Параметр userId (GET /users/:userId)
  */
+// export const userIdParamSchema = {
+//   [Segments.PARAMS]: Joi.object({
+//     userId: Joi.string().custom(objectIdValidator).required(),
+//   }),
+// };
 export const userIdParamSchema = {
   [Segments.PARAMS]: Joi.object({
-    userId: Joi.string().custom(objectIdValidator).required(),
+    userId: Joi.alternatives()
+      .try(
+        // Варіант А: це валідний ObjectID
+        Joi.string().custom(objectIdValidator),
+        // Варіант Б: це слово "me"
+        Joi.string().valid('me'),
+      )
+      .required(),
   }),
 };
 
