@@ -93,3 +93,12 @@ export const updateUserController = async (req, res) => {
     data: updatedUser,
   });
 };
+
+// GET /api/users/me - приватний ендпоінт інформація про поточного користувача
+export const getCurrentUser = async (req, res) => {
+  // Якщо req.user порожній, значить це гість
+  if (!req.user) {
+    return res.status(200).json(null); // Повертаємо 200, а не 401/400
+  }
+  res.status(200).json(req.user);
+};
